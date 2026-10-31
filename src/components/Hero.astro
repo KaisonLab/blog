@@ -1,0 +1,191 @@
+---
+import { Image } from 'astro:assets';
+import banner from '../assets/brand/banner.png';
+import { HERO_LINES, HERO_QUOTE, SITE_TAGLINE } from '../consts';
+import Icon from './Icon.astro';
+
+// {gold} 표기를 <em>으로 바꿔 타이핑 스크립트가 읽을 수 있게 넘긴다.
+const lines = HERO_LINES.map((l) => l.replace(/\{([^}]+)\}/g, '<em>$1</em>'));
+---
+
+<section class="hero">
+	<Image class="bg" src={banner} alt="" width={1500} height={500} loading="eager" />
+	<div class="shade"></div>
+	<div class="content">
+		<span class="badge ember"><Icon name="flame" size={14} /> {SITE_TAGLINE}</span>
+		<h1 id="typing" data-lines={JSON.stringify(lines)} aria-label={HERO_LINES[0].replace(/[{}]/g, '')}>
+			<span class="typed"></span><span class="caret" aria-hidden="true">|</span>
+		</h1>
+		<div class="quote-mark" aria-hidden="true">”</div>
+		<p class="quote">{HERO_QUOTE}</p>
+		<a class="down" href="#stats" aria-label="아래로">
+			<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+				<path fill="none" stroke="currentColor" stroke-width="2" d="m6 9 6 6 6-6"></path>
+			</svg>
+		</a>
+	</div>
+</section>
+
+<style>
+	.hero {
+		/* 어두운 그림 위라서 테마와 상관없이 밝은 글자 */
+		--text: #ece6da;
+		--text-2: #c9c2b4;
+		position: relative;
+		height: 100svh;
+		min-height: 560px;
+		display: grid;
+		place-items: center;
+		overflow: hidden;
+		margin: 0 calc(50% - 50vw);
+		width: 100vw;
+	}
+	.bg {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		object-position: 68% center;
+		transform: scale(1.04);
+		animation: drift 18s ease-in-out infinite alternate;
+	}
+	@keyframes drift {
+		from {
+			transform: scale(1.04) translateX(0);
+		}
+		to {
+			transform: scale(1.1) translateX(-1.5%);
+		}
+	}
+	.shade {
+		position: absolute;
+		inset: 0;
+		background:
+			linear-gradient(180deg, rgba(14, 13, 12, 0.55) 0%, rgba(14, 13, 12, 0.25) 45%, rgba(14, 13, 12, 1) 100%),
+			radial-gradient(ellipse at center, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.55));
+	}
+	.content {
+		position: relative;
+		text-align: center;
+		padding: 0 20px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 14px;
+	}
+	.content .badge {
+		font-size: 0.8rem;
+		padding: 6px 14px;
+	}
+	h1 {
+		font-size: clamp(2.4rem, 7vw, 5rem);
+		font-weight: 900;
+		letter-spacing: -0.02em;
+		line-height: 1.1;
+		min-height: 1.2em;
+		margin: 0;
+		text-shadow: 0 6px 30px rgba(0, 0, 0, 0.6);
+	}
+	h1 :global(em) {
+		font-style: normal;
+		color: var(--gold);
+	}
+	.caret {
+		color: var(--gold);
+		font-weight: 300;
+		animation: blink 1s steps(2) infinite;
+	}
+	@keyframes blink {
+		to {
+			opacity: 0;
+		}
+	}
+	.quote-mark {
+		font-size: 3rem;
+		line-height: 0.6;
+		color: var(--gold);
+		margin-top: 18px;
+		font-family: Georgia, serif;
+	}
+	.quote {
+		color: var(--text-2);
+		font-size: 1.05rem;
+		margin: 0;
+	}
+	.down {
+		margin-top: 36px;
+		width: 56px;
+		height: 56px;
+		border-radius: 50%;
+		border: 1px solid rgba(236, 230, 218, 0.4);
+		display: grid;
+		place-items: center;
+		color: var(--text);
+		animation: bob 2s ease-in-out infinite;
+	}
+	.down:hover {
+		border-color: var(--gold);
+		color: var(--gold);
+	}
+	@keyframes bob {
+		0%,
+		100% {
+			transform: translateY(0);
+		}
+		50% {
+			transform: translateY(6px);
+		}
+	}
+	@media (max-width: 480px) {
+		h1 {
+			font-size: 2rem;
+			/* 긴 문구가 두 줄로 접혀도 아래 요소가 튀지 않게 */
+			min-height: 2.4em;
+		}
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.bg,
+		.down,
+		.caret {
+			animation: none;
+		}
+	}
+</style>
+
+<script>
+	// 문구를 한 글자씩 타이핑했다가 지우고 다음 문구로 넘어간다.
+	const h1 = document.getElementById('typing');
+	const target = h1?.querySelector('.typed') as HTMLElement | null;
+	const lines: string[] = h1 ? JSON.parse(h1.dataset.lines || '[]') : [];
+	const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+	if (target && lines.length) {
+		if (reduce) {
+			target.innerHTML = lines[0];
+		} else {
+			let li = 0;
+			// <em>…</em> 태그는 한 덩어리로 다루기 위해 토큰으로 쪼갠다.
+			const tokenize = (html: string) => html.match(/<em>|<\/em>|[\s\S]/g) ?? [];
+			const run = async () => {
+				const tokens = tokenize(lines[li]);
+				let out = '';
+				for (const t of tokens) {
+					out += t;
+					target.innerHTML = out;
+					if (!t.startsWith('<')) await new Promise((r) => setTimeout(r, 70));
+				}
+				await new Promise((r) => setTimeout(r, 2200));
+				while (out.length) {
+					const last = tokens.pop()!;
+					out = out.slice(0, out.length - last.length);
+					target.innerHTML = out;
+					if (!last.startsWith('<')) await new Promise((r) => setTimeout(r, 30));
+				}
+				li = (li + 1) % lines.length;
+				setTimeout(run, 400);
+			};
+			run();
+		}
+	}
+</script>

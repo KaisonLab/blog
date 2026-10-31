@@ -1,0 +1,62 @@
+---
+import PostCard from '../../components/PostCard.astro';
+import Base from '../../layouts/Base.astro';
+import { countBy, getPosts } from '../../lib/posts';
+
+const posts = await getPosts();
+const cats = countBy(posts, 'category');
+---
+
+<Base title="글" description="지금까지 쓴 글 전부. 최신순.">
+	<main>
+		<div class="section-head top">
+			<h2>글 전체</h2>
+			<p>{posts.length}편 · 최신순</p>
+		</div>
+		<div class="chips">
+			<a class="badge" href="/blog/">전체 {posts.length}</a>
+			{
+				cats.map(([name, n]) => (
+					<a class="badge off" href={`/categories/${name}/`}>
+						{name} {n}
+					</a>
+				))
+			}
+		</div>
+		<section class="grid">
+			{posts.map((post) => <PostCard post={post} />)}
+		</section>
+	</main>
+</Base>
+
+<style>
+	.top {
+		margin-top: 36px;
+	}
+	.chips {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: 8px;
+		margin-bottom: 28px;
+	}
+	.badge.off {
+		background: transparent;
+		color: var(--text-2);
+		border-color: var(--line-2);
+	}
+	.badge.off:hover {
+		color: var(--gold);
+		border-color: var(--gold-3);
+	}
+	.grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+		gap: 20px;
+	}
+	@media (max-width: 720px) {
+		.grid {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

@@ -1,0 +1,408 @@
+---
+/*
+  왼쪽 슬라이드 메뉴 (인파 블로그 hELLO 스킨 구조 참고)
+  프로필 → 바로가기 → 숫자 → 카테고리 트리 → 태그 → SNS
+  헤더의 둥근 버튼(#sidebar-open)으로 열고, 닫기 버튼·배경 클릭·Esc로 닫는다.
+*/
+import { Image } from 'astro:assets';
+import avatar from '../assets/brand/avatar.png';
+import banner from '../assets/brand/banner.png';
+import { AUTHOR, BLOG_START_DATE, CATEGORIES, SITE_TAGLINE, SITE_TITLE, SOCIAL } from '../consts';
+import { countBy, getPosts } from '../lib/posts';
+import Icon from './Icon.astro';
+
+const posts = await getPosts();
+const counts = new Map(countBy(posts, 'category'));
+const tags = countBy(posts, 'tags').slice(0, 12);
+const days = Math.max(1, Math.floor((Date.now() - BLOG_START_DATE.valueOf()) / 86400000) + 1);
+const path = Astro.url.pathname;
+---
+
+<div class="sb-backdrop" id="sidebar-backdrop" hidden></div>
+<aside class="sb" id="sidebar" aria-label="사이드 메뉴" aria-hidden="true">
+	<button class="sb-close" id="sidebar-close" type="button" aria-label="메뉴 닫기">
+		<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+			<path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M6 6l12 12M18 6 6 18"></path>
+		</svg>
+	</button>
+
+	<div class="sb-profile">
+		<Image class="sb-bg" src={banner} alt="" width={750} height={250} />
+		<div class="sb-profile-body">
+			<Image class="sb-avatar" src={avatar} alt="" width={88} height={88} />
+			<a class="sb-title" href="/">{SITE_TITLE}</a>
+			<span class="sb-author">{AUTHOR.name} · {AUTHOR.role}</span>
+			<span class="sb-tagline">{SITE_TAGLINE}</span>
+		</div>
+	</div>
+
+	<ul class="sb-quick">
+		<li><a href="/" class:list={{ on: path === '/' }}><span><Icon name="home" size={22} /></span>홈</a></li>
+		<li><a href="/blog/" class:list={{ on: path.startsWith('/blog') }}><span><Icon name="book" size={22} /></span>글</a></li>
+		<li><a href="/about/" class:list={{ on: path.startsWith('/about') }}><span><Icon name="user" size={22} /></span>소개</a></li>
+	</ul>
+
+	<div class="sb-stats">
+		<div><strong>{posts.length}</strong><span>쓴 글</span></div>
+		<div><strong>{days}</strong><span>운영일</span></div>
+		<div><strong>{Object.keys(CATEGORIES).length}</strong><span>카테고리</span></div>
+	</div>
+
+	<nav class="sb-cats" aria-label="카테고리">
+		<a class="sb-cat all" href="/blog/" class:list={{ on: path === '/blog/' }}>
+			<span class="em"><Icon name="folder" size={18} /></span>
+			<span class="name">분류 전체보기</span>
+			<span class="n">{posts.length}</span>
+		</a>
+		{
+			Object.entries(CATEGORIES).map(([name, c]) => (
+				<a class="sb-cat" href={`/categories/${name}/`} class:list={{ on: path === `/categories/${name}/` }}>
+					<span class="em"><Icon name={c.icon as any} size={18} /></span>
+					<span class="name">{name}</span>
+					<span class="n">{counts.get(name) ?? 0}</span>
+				</a>
+			))
+		}
+	</nav>
+
+	{
+		tags.length > 0 && (
+			<div class="sb-tags">
+				<h4>태그</h4>
+				<div>
+					{tags.map(([t, n]) => (
+						<a href={`/tags/${t}/`}>
+							#{t} <small>{n}</small>
+						</a>
+					))}
+				</div>
+			</div>
+		)
+	}
+
+	<div class="sb-social">
+		<a href={SOCIAL.threads} target="_blank" rel="noopener">Threads</a>
+		<a href={SOCIAL.github} target="_blank" rel="noopener">GitHub</a>
+		<a href={SOCIAL.home} target="_blank" rel="noopener">kaisonlab.com</a>
+		<a href="/rss.xml">RSS</a>
+	</div>
+</aside>
+
+<style>
+	.sb-backdrop {
+		position: fixed;
+		inset: 0;
+		z-index: 90;
+		background: rgba(0, 0, 0, 0.55);
+		backdrop-filter: blur(2px);
+		opacity: 0;
+		transition: opacity 0.25s ease;
+	}
+	.sb-backdrop.show {
+		opacity: 1;
+	}
+	.sb {
+		position: fixed;
+		top: 0;
+		left: 0;
+		bottom: 0;
+		z-index: 100;
+		width: min(320px, 88vw);
+		background: var(--bg-2);
+		border-right: 1px solid var(--line);
+		box-shadow: 12px 0 40px rgba(0, 0, 0, 0.5);
+		transform: translateX(-105%);
+		transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+		overflow-y: auto;
+		overscroll-behavior: contain;
+		display: flex;
+		flex-direction: column;
+	}
+	.sb.open {
+		transform: translateX(0);
+	}
+	/* 세로 flex 안에서 각 블록이 찌그러지지 않게 */
+	.sb > * {
+		flex: none;
+	}
+	.sb-close {
+		position: absolute;
+		top: 12px;
+		right: 12px;
+		z-index: 3;
+		width: 36px;
+		height: 36px;
+		border-radius: 50%;
+		border: 1px solid var(--line-2);
+		background: var(--card);
+		color: var(--text);
+		display: grid;
+		place-items: center;
+		cursor: pointer;
+	}
+	.sb-close:hover {
+		color: var(--gold);
+		border-color: var(--gold);
+	}
+
+	/* 프로필 */
+	.sb-profile {
+		position: relative;
+		padding: 36px 20px 20px;
+		text-align: center;
+		overflow: hidden;
+		border-bottom: 1px solid var(--line);
+	}
+	.sb-bg {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		object-position: 70% center;
+		opacity: 0.35;
+		mask-image: linear-gradient(180deg, #000 30%, transparent 100%);
+		-webkit-mask-image: linear-gradient(180deg, #000 30%, transparent 100%);
+	}
+	.sb-profile-body {
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 4px;
+	}
+	.sb-avatar {
+		width: 88px;
+		height: 88px;
+		border-radius: 50%;
+		border: 3px solid var(--gold-3);
+		box-shadow: 0 0 0 4px rgba(224, 191, 124, 0.15);
+		margin-bottom: 8px;
+	}
+	.sb-title {
+		font-weight: 900;
+		font-size: 1.25rem;
+		color: var(--text);
+	}
+	.sb-author {
+		font-size: 0.85rem;
+		color: var(--text-2);
+	}
+	.sb-tagline {
+		font-size: 0.78rem;
+		color: var(--gold-2);
+		letter-spacing: 0.04em;
+	}
+
+	/* 바로가기 */
+	.sb-quick {
+		list-style: none;
+		margin: 0;
+		padding: 12px 14px 0;
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 8px;
+	}
+	.sb-quick a {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 2px;
+		padding: 10px 6px;
+		border-radius: var(--radius-sm);
+		border: 1px solid var(--line);
+		background: var(--card);
+		color: var(--text-2);
+		font-size: 0.85rem;
+		font-weight: 600;
+	}
+	.sb-quick a span {
+		display: grid;
+	}
+	.sb-quick a:hover,
+	.sb-quick a.on {
+		color: var(--gold);
+		border-color: var(--gold-3);
+	}
+
+	/* 숫자 */
+	.sb-stats {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		margin: 14px 14px 0;
+		border: 1px solid var(--line);
+		border-radius: var(--radius-sm);
+		background: var(--card);
+		overflow: hidden;
+	}
+	.sb-stats div {
+		padding: 10px 4px;
+		text-align: center;
+		display: flex;
+		flex-direction: column;
+		border-right: 1px solid var(--line);
+	}
+	.sb-stats div:last-child {
+		border-right: none;
+	}
+	.sb-stats strong {
+		color: var(--gold);
+		font-size: 1.2rem;
+		font-weight: 900;
+		line-height: 1.1;
+	}
+	.sb-stats span {
+		color: var(--muted);
+		font-size: 0.72rem;
+	}
+
+	/* 카테고리 */
+	.sb-cats {
+		display: flex;
+		flex-direction: column;
+		padding: 16px 14px 0;
+		gap: 2px;
+	}
+	.sb-cat {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		padding: 9px 12px;
+		border-radius: var(--radius-sm);
+		color: var(--text-2);
+		font-size: 0.95rem;
+		font-weight: 600;
+	}
+	.sb-cat.all {
+		color: var(--text);
+		margin-bottom: 4px;
+		border-bottom: 1px dashed var(--line-2);
+		border-radius: 0;
+		padding-bottom: 12px;
+	}
+	.sb-cat:not(.all) {
+		padding-left: 22px;
+	}
+	.sb-cat .em {
+		width: 22px;
+		display: grid;
+		place-items: center;
+	}
+	.sb-cat .name {
+		flex: 1;
+	}
+	.sb-cat .n {
+		font-size: 0.78rem;
+		color: var(--muted);
+		background: var(--card-2);
+		border: 1px solid var(--line);
+		border-radius: 999px;
+		padding: 0 8px;
+		min-width: 26px;
+		text-align: center;
+	}
+	.sb-cat:hover,
+	.sb-cat.on {
+		background: var(--gold-dim);
+		color: var(--gold);
+	}
+	.sb-cat.on .n,
+	.sb-cat:hover .n {
+		color: var(--gold);
+		border-color: var(--gold-3);
+	}
+
+	/* 태그 */
+	.sb-tags {
+		padding: 18px 14px 0;
+	}
+	.sb-tags h4 {
+		font-size: 0.78rem;
+		letter-spacing: 0.08em;
+		color: var(--muted);
+		margin: 0 0 8px 12px;
+	}
+	.sb-tags div {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 6px;
+		padding: 0 6px;
+	}
+	.sb-tags a {
+		font-size: 0.8rem;
+		padding: 3px 9px;
+		border-radius: 999px;
+		border: 1px solid var(--line-2);
+		color: var(--text-2);
+	}
+	.sb-tags a small {
+		color: var(--muted);
+	}
+	.sb-tags a:hover {
+		color: var(--gold);
+		border-color: var(--gold-3);
+	}
+
+	/* SNS */
+	.sb-social {
+		margin-top: auto;
+		padding: 20px 14px 22px;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 6px 14px;
+		justify-content: center;
+		font-size: 0.82rem;
+		border-top: 1px solid var(--line);
+	}
+	.sb-social a {
+		color: var(--muted);
+	}
+	.sb-social a:hover {
+		color: var(--gold);
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.sb,
+		.sb-backdrop {
+			transition: none;
+		}
+	}
+</style>
+
+<script>
+	const sb = document.getElementById('sidebar');
+	const backdrop = document.getElementById('sidebar-backdrop');
+	const openBtn = document.getElementById('sidebar-open');
+	const closeBtn = document.getElementById('sidebar-close');
+
+	const open = () => {
+		if (!sb || !backdrop) return;
+		backdrop.hidden = false;
+		requestAnimationFrame(() => {
+			backdrop.classList.add('show');
+			sb.classList.add('open');
+		});
+		sb.setAttribute('aria-hidden', 'false');
+		openBtn?.setAttribute('aria-expanded', 'true');
+		document.body.style.overflow = 'hidden';
+		closeBtn?.focus();
+	};
+	const close = () => {
+		if (!sb || !backdrop) return;
+		backdrop.classList.remove('show');
+		sb.classList.remove('open');
+		sb.setAttribute('aria-hidden', 'true');
+		openBtn?.setAttribute('aria-expanded', 'false');
+		document.body.style.overflow = '';
+		setTimeout(() => {
+			backdrop.hidden = true;
+		}, 260);
+		openBtn?.focus();
+	};
+
+	openBtn?.addEventListener('click', open);
+	closeBtn?.addEventListener('click', close);
+	backdrop?.addEventListener('click', close);
+	document.addEventListener('keydown', (e) => {
+		if (e.key === 'Escape' && sb?.classList.contains('open')) close();
+	});
+</script>

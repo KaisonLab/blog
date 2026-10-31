@@ -1,0 +1,60 @@
+---
+import PostCard from '../../components/PostCard.astro';
+import Icon from '../../components/Icon.astro';
+import Base from '../../layouts/Base.astro';
+import { CATEGORIES } from '../../consts';
+import { getPosts } from '../../lib/posts';
+
+export async function getStaticPaths() {
+	const posts = await getPosts();
+	return Object.keys(CATEGORIES).map((category) => ({
+		params: { category },
+		props: { posts: posts.filter((p) => p.data.category === category) },
+	}));
+}
+
+const { category } = Astro.params;
+const { posts } = Astro.props;
+const meta = CATEGORIES[category!] ?? { icon: 'notebook', desc: '' };
+---
+
+<Base title={`${category} 글`} description={meta.desc}>
+	<main>
+		<div class="section-head top">
+			<h2>{category}<span class="em"><Icon name={meta.icon as any} size={22} /></span></h2>
+			<p>{meta.desc} · {posts.length}편</p>
+		</div>
+		{
+			posts.length ? (
+				<section class="grid">
+					{posts.map((post) => (
+						<PostCard post={post} />
+					))}
+				</section>
+			) : (
+				<p class="empty">아직 이 카테고리에 글이 없습니다.</p>
+			)
+		}
+	</main>
+</Base>
+
+<style>
+	.top {
+		margin-top: 36px;
+	}
+	.grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+		gap: 20px;
+	}
+	.empty {
+		text-align: center;
+		color: var(--muted);
+		padding: 60px 0;
+	}
+	@media (max-width: 720px) {
+		.grid {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

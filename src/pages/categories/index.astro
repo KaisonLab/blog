@@ -1,0 +1,102 @@
+---
+import Icon from '../../components/Icon.astro';
+import Base from '../../layouts/Base.astro';
+import { CATEGORIES } from '../../consts';
+import { countBy, getPosts } from '../../lib/posts';
+
+const posts = await getPosts();
+const counts = new Map(countBy(posts, 'category'));
+const tags = countBy(posts, 'tags');
+---
+
+<Base title="카테고리" description="카테고리와 태그 목록">
+	<main>
+		<div class="section-head top">
+			<h2>카테고리<span class="em"><Icon name="crown" size={22} /></span></h2>
+			<p>무엇을 기록하는지 한눈에</p>
+		</div>
+		<section class="list">
+			{
+				Object.entries(CATEGORIES).map(([name, c]) => (
+					<a class="card row" href={`/categories/${name}/`}>
+						<span class="emoji"><Icon name={c.icon as any} size={24} /></span>
+						<div>
+							<strong>{name}</strong>
+							<p>{c.desc}</p>
+						</div>
+						<span class="count">{counts.get(name) ?? 0}</span>
+					</a>
+				))
+			}
+		</section>
+
+		{
+			tags.length > 0 && (
+				<>
+					<div class="section-head">
+						<h2>
+							태그<span class="em"><Icon name="tag" size={22} /></span>
+						</h2>
+						<p>글에 붙인 태그</p>
+					</div>
+					<div class="tags">
+						{tags.map(([t, n]) => (
+							<a class="badge" href={`/tags/${t}/`}>
+								#{t} <small>{n}</small>
+							</a>
+						))}
+					</div>
+				</>
+			)
+		}
+	</main>
+</Base>
+
+<style>
+	.top {
+		margin-top: 36px;
+	}
+	.list {
+		display: grid;
+		gap: 12px;
+		max-width: 720px;
+		margin: 0 auto;
+	}
+	.row {
+		display: flex;
+		align-items: center;
+		gap: 16px;
+		padding: 16px 20px;
+		color: var(--text);
+	}
+	.emoji {
+		color: var(--gold);
+		width: 56px;
+		height: 56px;
+		display: grid;
+		place-items: center;
+		border-radius: 50%;
+		background: var(--gold-dim);
+		flex: none;
+	}
+	.row p {
+		margin: 2px 0 0;
+		color: var(--muted);
+		font-size: 0.9rem;
+	}
+	.count {
+		margin-left: auto;
+		font-weight: 800;
+		color: var(--gold);
+		font-size: 1.2rem;
+	}
+	.tags {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: 8px;
+	}
+	.tags small {
+		opacity: 0.7;
+	}
+</style>

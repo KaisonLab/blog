@@ -1,0 +1,333 @@
+/*
+  Kaison Lab 블로그 전역 스타일
+  톤: 밝은 종이 위 금색 포인트가 기본, 어두운 대장간은 토글. 카드형 레이아웃은 인파 블로그 구조를 참고.
+*/
+
+:root {
+	color-scheme: light;
+	--bg: #f5f3ee;
+	--bg-2: #ece9e2;
+	--card: #fffdf9;
+	--card-2: #f6f3ec;
+	--line: #e3ded4;
+	--line-2: #cfc8bb;
+	--text: #1e1b16;
+	--text-2: #4a463f;
+	--muted: #7d786f;
+	--gold: #9a6f1c;
+	--gold-2: #b8892b;
+	--gold-3: #c9a45a;
+	--gold-dim: rgba(184, 137, 43, 0.14);
+	--ember: #c24a30;
+	--ember-dim: rgba(194, 74, 48, 0.12);
+	--ember-text: #b8432b;
+	--header-bg: rgba(245, 243, 238, 0.86);
+	--thumb-a: #ebe6dc;
+	--thumb-b: #dcd5c7;
+	--code-bg: #111009;
+	--veil: rgba(14, 13, 12, 0.6);
+	--veil-line: rgba(236, 230, 218, 0.25);
+	/* 통계 카드 4색 (인파 블로그의 파랑·빨강·노랑·초록 자리) */
+	--c-1: #3f6fb5;
+	--c-2: #c24a30;
+	--c-3: #b8892b;
+	--c-4: #3a8f6e;
+	--shadow: 0 10px 30px rgba(30, 27, 22, 0.1);
+	--shadow-gold: 0 8px 28px rgba(154, 111, 28, 0.14);
+
+	--radius: 18px;
+	--radius-sm: 10px;
+	--max: 1120px;
+	--font: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto,
+		'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+	--mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+/* 어두운 대장간 테마: 헤더 토글(data-theme="dark")로 켠다. 기본은 밝은 테마. */
+:root[data-theme='dark'] {
+	color-scheme: dark;
+	--bg: #0e0d0c;
+	--bg-2: #151412;
+	--card: #1b1916;
+	--card-2: #221f1b;
+	--line: #2e2a25;
+	--line-2: #3b3730;
+	--text: #ece6da;
+	--text-2: #c9c2b4;
+	--muted: #8f897d;
+	--gold: #e0bf7c;
+	--gold-2: #d4b06a;
+	--gold-3: #a8873f;
+	--gold-dim: rgba(224, 191, 124, 0.14);
+	--ember: #e0533f;
+	--ember-dim: rgba(224, 83, 63, 0.16);
+	--ember-text: #ff8a73;
+	--header-bg: rgba(14, 13, 12, 0.82);
+	--thumb-a: #221f1b;
+	--thumb-b: #15130f;
+	--c-1: #7ea3e0;
+	--c-2: #ff8a73;
+	--c-3: #e0bf7c;
+	--c-4: #7cc7a6;
+	--shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+	--shadow-gold: 0 8px 28px rgba(224, 191, 124, 0.12);
+}
+
+* {
+	box-sizing: border-box;
+}
+
+html {
+	scroll-behavior: smooth;
+	-webkit-text-size-adjust: 100%;
+}
+
+body {
+	margin: 0;
+	background: var(--bg);
+	color: var(--text);
+	font-family: var(--font);
+	font-size: 17px;
+	line-height: 1.75;
+	word-break: keep-all;
+	overflow-wrap: anywhere;
+}
+
+body::before {
+	/* 비늘 느낌의 은은한 점 패턴 */
+	content: '';
+	position: fixed;
+	inset: 0;
+	pointer-events: none;
+	background-image: radial-gradient(rgba(224, 191, 124, 0.06) 1px, transparent 1px);
+	background-size: 26px 26px;
+	z-index: 0;
+}
+
+main {
+	position: relative;
+	z-index: 1;
+	width: min(var(--max), calc(100% - 32px));
+	margin: 0 auto;
+	padding: 24px 0 80px;
+}
+
+a {
+	color: var(--gold);
+	text-decoration: none;
+}
+a:hover {
+	color: var(--gold-2);
+}
+
+h1,
+h2,
+h3,
+h4 {
+	color: var(--text);
+	line-height: 1.25;
+	margin: 0 0 0.5em;
+	letter-spacing: -0.01em;
+}
+h1 {
+	font-size: clamp(2rem, 4vw, 2.8rem);
+	font-weight: 800;
+}
+h2 {
+	font-size: clamp(1.5rem, 3vw, 2rem);
+	font-weight: 800;
+}
+h3 {
+	font-size: 1.3rem;
+	font-weight: 700;
+}
+
+p {
+	margin: 0 0 1em;
+}
+
+img {
+	max-width: 100%;
+	height: auto;
+	display: block;
+}
+
+code {
+	font-family: var(--mono);
+	font-size: 0.9em;
+	background: var(--card-2);
+	border: 1px solid var(--line);
+	border-radius: 6px;
+	padding: 2px 6px;
+	color: var(--gold);
+}
+
+pre {
+	background: var(--code-bg) !important;
+	color: #ece6da;
+	border: 1px solid var(--line);
+	border-radius: var(--radius-sm);
+	padding: 18px 20px;
+	overflow-x: auto;
+	font-size: 0.92rem;
+	line-height: 1.6;
+}
+pre code {
+	background: none;
+	border: none;
+	padding: 0;
+	color: inherit;
+}
+
+blockquote {
+	margin: 1.4em 0;
+	padding: 14px 20px;
+	border-left: 4px solid var(--gold);
+	background: var(--gold-dim);
+	border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+	color: var(--text-2);
+}
+blockquote p:last-child {
+	margin-bottom: 0;
+}
+
+hr {
+	border: none;
+	border-top: 1px solid var(--line);
+	margin: 2.5em 0;
+}
+
+table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 0.95rem;
+	margin: 1.2em 0;
+}
+th,
+td {
+	border: 1px solid var(--line);
+	padding: 10px 12px;
+	text-align: left;
+}
+th {
+	background: var(--card-2);
+	color: var(--gold);
+}
+
+.sr-only {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border: 0;
+}
+
+/* 공통 섹션 헤더: "제목 이모지 / 한 줄 설명" */
+.section-head {
+	text-align: center;
+	margin: 72px 0 32px;
+}
+.section-head h2 {
+	margin-bottom: 6px;
+}
+.section-head h2 .em {
+	display: inline-block;
+	transform: translateY(2px);
+	margin-left: 6px;
+}
+.section-head p {
+	color: var(--muted);
+	margin: 0;
+	font-size: 0.98rem;
+}
+
+/* 공통 배지 */
+.badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 0.78rem;
+	font-weight: 700;
+	letter-spacing: 0.02em;
+	padding: 4px 10px;
+	border-radius: 999px;
+	background: var(--gold-dim);
+	color: var(--gold);
+	border: 1px solid rgba(224, 191, 124, 0.25);
+}
+.badge.ember {
+	background: var(--ember-dim);
+	color: var(--ember-text);
+	border-color: rgba(224, 83, 63, 0.35);
+}
+
+/* 카드 */
+.card {
+	background: var(--card);
+	border: 1px solid var(--line);
+	border-radius: var(--radius);
+	transition:
+		transform 0.25s ease,
+		border-color 0.25s ease,
+		box-shadow 0.25s ease;
+}
+.card:hover {
+	transform: translateY(-4px);
+	border-color: var(--gold-3);
+	box-shadow: var(--shadow-gold);
+}
+
+/* 본문(prose) */
+.prose {
+	font-size: 1.05rem;
+	color: var(--text-2);
+}
+.prose h2 {
+	margin-top: 2.2em;
+	padding-bottom: 0.3em;
+	border-bottom: 1px solid var(--line);
+	font-size: 1.6rem;
+}
+.prose h3 {
+	margin-top: 1.8em;
+	font-size: 1.25rem;
+}
+.prose ul,
+.prose ol {
+	padding-left: 1.4em;
+}
+.prose li {
+	margin: 0.3em 0;
+}
+.prose li::marker {
+	color: var(--gold-3);
+}
+.prose strong {
+	color: var(--text);
+}
+.prose img {
+	border-radius: var(--radius-sm);
+	border: 1px solid var(--line);
+	margin: 1.4em auto;
+}
+.prose a {
+	text-decoration: underline;
+	text-underline-offset: 3px;
+	text-decoration-color: rgba(224, 191, 124, 0.4);
+}
+
+@media (max-width: 720px) {
+	body {
+		font-size: 16px;
+	}
+	main {
+		width: calc(100% - 32px);
+	}
+	.section-head {
+		margin: 56px 0 24px;
+	}
+}

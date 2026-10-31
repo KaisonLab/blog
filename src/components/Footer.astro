@@ -1,0 +1,81 @@
+---
+import { Image } from 'astro:assets';
+import avatar from '../assets/brand/avatar.png';
+import { AUTHOR, SITE_TAGLINE, SITE_TITLE, SOCIAL } from '../consts';
+const year = new Date().getFullYear();
+---
+
+<footer>
+	<div class="inner">
+		<div class="who">
+			<Image src={avatar} alt="Kaison" width={56} height={56} />
+			<div>
+				<strong>{SITE_TITLE}</strong>
+				<span>{SITE_TAGLINE}</span>
+			</div>
+		</div>
+		<div class="links">
+			<a href={SOCIAL.home} target="_blank" rel="noopener">kaisonlab.com</a>
+			<a href={SOCIAL.threads} target="_blank" rel="noopener">Threads</a>
+			<a href={SOCIAL.github} target="_blank" rel="noopener">GitHub</a>
+			<a href="/rss.xml">RSS</a>
+		</div>
+		<p class="copy">© {year} {AUTHOR.name}. Astro로 만들고 Cloudflare Pages에 올렸습니다.</p>
+	</div>
+</footer>
+
+<style>
+	footer {
+		position: relative;
+		z-index: 1;
+		border-top: 1px solid var(--line);
+		background: var(--bg-2);
+		padding: 40px 0 48px;
+	}
+	.inner {
+		width: min(var(--max), calc(100% - 32px));
+		margin: 0 auto;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 16px;
+		text-align: center;
+	}
+	.who {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+	}
+	.who img {
+		border-radius: 50%;
+		border: 2px solid var(--gold-3);
+	}
+	.who div {
+		display: flex;
+		flex-direction: column;
+		text-align: left;
+		line-height: 1.3;
+	}
+	.who span {
+		color: var(--muted);
+		font-size: 0.85rem;
+	}
+	.links {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: 6px 18px;
+		font-size: 0.92rem;
+	}
+	.links a {
+		color: var(--text-2);
+	}
+	.links a:hover {
+		color: var(--gold);
+	}
+	.copy {
+		color: var(--muted);
+		font-size: 0.82rem;
+		margin: 0;
+	}
+</style>

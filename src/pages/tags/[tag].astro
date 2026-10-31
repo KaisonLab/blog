@@ -1,0 +1,45 @@
+---
+import PostCard from '../../components/PostCard.astro';
+import Icon from '../../components/Icon.astro';
+import Base from '../../layouts/Base.astro';
+import { countBy, getPosts } from '../../lib/posts';
+
+export async function getStaticPaths() {
+	const posts = await getPosts();
+	return countBy(posts, 'tags').map(([tag]) => ({
+		params: { tag },
+		props: { posts: posts.filter((p) => p.data.tags.includes(tag)) },
+	}));
+}
+
+const { tag } = Astro.params;
+const { posts } = Astro.props;
+---
+
+<Base title={`#${tag}`} description={`${tag} 태그가 붙은 글`}>
+	<main>
+		<div class="section-head top">
+			<h2>#{tag}<span class="em"><Icon name="tag" size={22} /></span></h2>
+			<p>{posts.length}편</p>
+		</div>
+		<section class="grid">
+			{posts.map((post) => <PostCard post={post} />)}
+		</section>
+	</main>
+</Base>
+
+<style>
+	.top {
+		margin-top: 36px;
+	}
+	.grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+		gap: 20px;
+	}
+	@media (max-width: 720px) {
+		.grid {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

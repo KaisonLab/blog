@@ -1,0 +1,131 @@
+---
+import Hero from '../components/Hero.astro';
+import Icon from '../components/Icon.astro';
+import PostCard from '../components/PostCard.astro';
+import StatsSection from '../components/StatsSection.astro';
+import Base from '../layouts/Base.astro';
+import { CATEGORIES, SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import { countBy, getPosts } from '../lib/posts';
+
+const posts = await getPosts();
+const latest = posts.slice(0, 7);
+const counts = new Map(countBy(posts, 'category'));
+const categories = Object.entries(CATEGORIES).map(([name, meta]) => ({
+	name,
+	...meta,
+	count: counts.get(name) ?? 0,
+}));
+---
+
+<Base title={SITE_TITLE} description={SITE_DESCRIPTION} overlayHeader>
+	<Hero />
+	<main>
+		<StatsSection postCount={posts.length} />
+
+		<div class="section-head">
+			<h2>최근 글<span class="em"><Icon name="edit" size={22} /></span></h2>
+			<p>최근에 만들고, 겪고, 배운 것</p>
+		</div>
+		<section class="grid">
+			{latest.map((post, i) => <PostCard post={post} featured={i === 0} />)}
+		</section>
+		<p class="more">
+			<a class="badge" href="/blog/">글 전체 보기 <Icon name="arrow" size={16} /></a>
+		</p>
+
+		<div class="section-head">
+			<h2>카테고리<span class="em"><Icon name="crown" size={22} /></span></h2>
+			<p>무엇을 기록하는지 한눈에</p>
+		</div>
+		<section class="cats">
+			{
+				categories.map((c, i) => (
+					<a class="card cat" href={`/categories/${c.name}/`}>
+						<span class="rank">#{i + 1}</span>
+						<span class="emoji"><Icon name={c.icon as any} size={30} stroke={1.5} /></span>
+						<strong>{c.name}</strong>
+						<small>{c.count} Articles</small>
+						<p>{c.desc}</p>
+					</a>
+				))
+			}
+		</section>
+	</main>
+</Base>
+
+<style>
+	main {
+		padding-top: 0;
+	}
+	.grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+		gap: 20px;
+	}
+	.more {
+		text-align: center;
+		margin-top: 28px;
+	}
+	.more .badge {
+		font-size: 0.95rem;
+		padding: 10px 20px;
+	}
+	.cats {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+		gap: 16px;
+	}
+	.cat {
+		position: relative;
+		padding: 26px 18px 20px;
+		text-align: center;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 4px;
+		color: var(--text);
+	}
+	.rank {
+		position: absolute;
+		top: 12px;
+		left: 12px;
+		font-size: 0.72rem;
+		font-weight: 800;
+		padding: 2px 8px;
+		border-radius: 999px;
+		background: var(--ember-dim);
+		color: var(--ember-text);
+	}
+	.cat .emoji {
+		color: var(--gold);
+		width: 72px;
+		height: 72px;
+		display: grid;
+		place-items: center;
+		border-radius: 50%;
+		background: var(--gold-dim);
+		margin-bottom: 6px;
+	}
+	.cat strong {
+		font-size: 1.05rem;
+	}
+	.cat small {
+		color: var(--gold-2);
+		font-size: 0.82rem;
+	}
+	.cat p {
+		margin: 8px 0 0;
+		color: var(--muted);
+		font-size: 0.85rem;
+		line-height: 1.5;
+	}
+	@media (max-width: 720px) {
+		.cats {
+			grid-template-columns: 1fr 1fr;
+			gap: 10px;
+		}
+		.grid {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

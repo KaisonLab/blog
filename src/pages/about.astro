@@ -1,0 +1,86 @@
+---
+import { Image } from 'astro:assets';
+import stickers from '../assets/brand/stickers.png';
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { AUTHOR, SITE_TAGLINE, SOCIAL } from '../consts';
+---
+
+<Base title="소개" description={AUTHOR.bio}>
+	<main>
+		<section class="about">
+			<Image class="stickers" src={stickers} alt="Kaison 캐릭터" width={520} height={520} />
+			<div class="text">
+				<span class="badge ember"><Icon name="flame" size={14} /> {SITE_TAGLINE}</span>
+				<h1>{AUTHOR.name}</h1>
+				<p class="role">{AUTHOR.role}</p>
+				<p>{AUTHOR.bio}</p>
+				<h3>이 블로그에서 다루는 것</h3>
+				<ul>
+					<li>작은 서비스를 만들어 가는 과정과 그때그때 막혔던 지점</li>
+					<li>출시하거나 크게 바꾼 뒤에 무엇이 달라졌는지</li>
+					<li>기술을 고른 이유와 문제를 풀어 간 과정</li>
+					<li>잘된 시도와 실패한 시도, 둘 다</li>
+				</ul>
+				<h3>이렇게 씁니다</h3>
+				<ul>
+					<li>숫자는 기준 날짜와 함께, 실제로 센 값만 적습니다</li>
+					<li>작은 시도도 빼놓지 않고 그 주에 남깁니다</li>
+				</ul>
+				<div class="links">
+					<a class="badge" href={SOCIAL.home} target="_blank" rel="noopener">kaisonlab.com</a>
+					<a class="badge" href={SOCIAL.threads} target="_blank" rel="noopener">Threads</a>
+					<a class="badge" href={SOCIAL.github} target="_blank" rel="noopener">GitHub</a>
+				</div>
+			</div>
+		</section>
+	</main>
+</Base>
+
+<style>
+	.about {
+		display: grid;
+		grid-template-columns: 1fr 1.2fr;
+		gap: 40px;
+		align-items: center;
+		padding-top: 36px;
+	}
+	.stickers {
+		border-radius: var(--radius);
+		border: 1px solid var(--line);
+		box-shadow: var(--shadow);
+	}
+	.text h1 {
+		margin: 12px 0 2px;
+	}
+	.role {
+		color: var(--gold-2);
+		margin-bottom: 18px;
+	}
+	.text h3 {
+		margin-top: 1.6em;
+		font-size: 1.1rem;
+	}
+	.text ul {
+		padding-left: 1.2em;
+		color: var(--text-2);
+	}
+	.text li::marker {
+		color: var(--gold-3);
+	}
+	.links {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+		margin-top: 24px;
+	}
+	@media (max-width: 820px) {
+		.about {
+			grid-template-columns: 1fr;
+		}
+		.stickers {
+			max-width: 360px;
+			margin: 0 auto;
+		}
+	}
+</style>
