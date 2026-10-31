@@ -4,7 +4,7 @@ export const SITE_TITLE = 'Kaison Lab';
 export const SITE_TAGLINE = '행동하고, 기록한다.';
 export const SITE_DESCRIPTION =
 	'생각만 하던 것을 행동으로 옮기고, 그 경험을 있는 그대로 기록하는 개발자의 일지.';
-export const SITE_URL = 'https://kaisonlab.com';
+export const SITE_URL = 'https://blog.kaisonlab.com';
 
 export const AUTHOR = {
 	name: 'Kaison',

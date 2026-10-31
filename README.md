@@ -59,5 +59,5 @@ npm run preview  # 빌드 결과 미리보기
 
 1. Cloudflare 대시보드 → Workers & Pages → Create → Pages → Connect to Git → `KaisonLab/blog` 선택
 2. 빌드 설정: Framework preset `Astro`, Build command `npm run build`, Build output `dist`, Root directory는 비워 둠
-3. Custom domains에서 `kaisonlab.com`과 `www.kaisonlab.com` 추가 (도메인이 Cloudflare DNS에 있으면 레코드는 자동으로 생긴다)
+3. Custom domains에서 `blog.kaisonlab.com` 추가 (kaisonlab.com이 Cloudflare DNS에 있어 CNAME은 자동으로 생긴다)
 4. 이후 main에 푸시할 때마다 자동 배포. 사이트 주소는 `astro.config.mjs`의 `site`와 `src/consts.ts`의 `SITE_URL`에 맞춰 둔다
